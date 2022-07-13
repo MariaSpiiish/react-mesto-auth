@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { api } from '../utils/Api';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
-// import PopupWithForm from './PopupWithForm';
+import Login from './Login';
+import Register from './Register';
+import ProtectedRoute from './ProtectedRoute';
 import ImagePopup from './ImagePopup';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
+import AddPlacePopup from './AddPlacePopup';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { CardsContext } from '../contexts/CardsContext';
-import AddPlacePopup from './AddPlacePopup';
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
@@ -18,6 +21,7 @@ function App() {
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState({name: '', about: '', avatar: ''});
   const [cards, setCards] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {
     api.getUserInfo()
@@ -108,8 +112,30 @@ function App() {
         <div className="page-container">
           <div className="page">
             <Header />
-            <Main onEditAvatar={setIsEditAvatarPopupOpen} onEditProfile={setIsEditProfilePopupOpen} onAddPlace={setIsAddPlacePopupOpen} onCardClick={setSelectedCard} onCardLike={handleCardLike} onCardDelete={handleCardDelete} cards={cards}/>
+            <Switch>
+              <ProtectedRoute 
+                  onEditAvatar={setIsEditAvatarPopupOpen} 
+                  onEditProfile={setIsEditProfilePopupOpen} 
+                  onAddPlace={setIsAddPlacePopupOpen} 
+                  onCardClick={setSelectedCard} 
+                  onCardLike={handleCardLike} 
+                  onCardDelete={handleCardDelete} 
+                  cards={cards}
+                  path="/mesto-react"
+                  loggedIn={isLoggedIn}
+                  component={Main}
+              />
+              <Route path="/sign-in">
+                <Login />
+              </Route>
+              <Route path="/sign-up">
+                <Register />
+              </Route>
+              <Route exact path="/">
+                {isLoggedIn ? <Redirect to="/mesto-react" /> : <Redirect to="/sign-in" />}
+              </Route>
             
+            </Switch>
             <Footer />
 
             <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>

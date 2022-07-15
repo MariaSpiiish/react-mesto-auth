@@ -39,7 +39,7 @@ function App() {
               const email = res.data.email;
               setOwnerEmail(email);
               setIsLoggedIn(true);
-              history.push("/mesto-react");
+              history.push("/react-mesto-auth");
             })
         }
       }
@@ -100,7 +100,7 @@ function App() {
           if (data.token){
               localStorage.setItem('token', data.token);
               setIsLoggedIn(true);
-              history.push("/mesto-react");
+              history.push("/react-mesto-auth");
           }
       })
       .catch((err) => {
@@ -183,7 +183,7 @@ function App() {
                   onCardDelete={handleCardDelete} 
                   cards={cards}
                   ownerEmail={ownerEmail} 
-                  path="/mesto-react"
+                  path="/react-mesto-auth"
                   loggedIn={isLoggedIn}
                   component={Main}
               />
@@ -199,7 +199,7 @@ function App() {
               </Route>
 
               <Route exact path="/">
-                {isLoggedIn ? <Redirect to="/mesto-react" /> : <Redirect to="/sign-in" />}
+                {isLoggedIn ? <Redirect to="/react-mesto-auth" /> : <Redirect to="/sign-in" />}
               </Route>
             
             </Switch>

@@ -1,13 +1,25 @@
 import { useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import Card from './Card';
+import Header from './Header';
 
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 // import { CardsContext } from '../contexts/CardsContext';
 
-function Main({onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike, onCardDelete, cards}) {
+function Main({onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike, onCardDelete, cards, ownerEmail}) {
   const currentUser = useContext(CurrentUserContext);
+  const history = useHistory();
     
     return (
+      <>
+        <Header 
+          ownerEmail={ownerEmail} 
+          redirect={() => {
+            localStorage.removeItem('token');
+            history.push("/sign-in");
+          }}
+          buttonText="Выйти"
+        />
         <main className="content">
             <section className="profile">
               <div className="profile__avatar">
@@ -42,6 +54,7 @@ function Main({onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike,
             </section>
 
         </main>
+      </>  
     );
 }
 

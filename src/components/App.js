@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
 import { api } from '../utils/Api';
 import Header from './Header';
 import Main from './Main';
@@ -11,17 +11,42 @@ import ImagePopup from './ImagePopup';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
+import RegistrationResult from './RegistrationResult';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { CardsContext } from '../contexts/CardsContext';
+import { auth } from '../utils/Auth';
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isRegistrationSuccessful, setIsRegistrationSuccessful] = useState(false);
+  const [isInfoPopupOpen, setIsInfoPopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState({name: '', about: '', avatar: ''});
   const [cards, setCards] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const history = useHistory();
+  const [ownerEmail, setOwnerEmail] = useState('');
+
+  useEffect(() => {
+    const checkToken = () => {
+      if(localStorage.getItem('token')) {
+        const token = localStorage.getItem('token');
+        if(token) {
+          auth.getToken(token)
+            .then((res) => {
+              const email = res.data.email;
+              setOwnerEmail(email);
+              setIsLoggedIn(true);
+              history.push("/mesto-react");
+            })
+        }
+      }
+    }
+    checkToken();
+  }, [history]);
+
 
   useEffect(() => {
     api.getUserInfo()
@@ -45,7 +70,43 @@ function App() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
+    setIsInfoPopupOpen(false);
     setSelectedCard({});
+  }
+
+  const handleRegistration = (data) => {
+    auth.register(data.email, data.password)
+        .then((res) => {
+            if(res) {
+              handleRegistrationResult(true)
+            }
+        })
+        .catch((err) => {
+          handleRegistrationResult(false)
+          console.log(`Ошибка в регистрации пользователя: ${err}`);
+        });
+
+    // history.push("/sign-in");
+  }
+
+  const handleRegistrationResult = (result) => {
+    setIsRegistrationSuccessful(result);
+    setIsInfoPopupOpen(true);
+  }
+
+  const handleLogin = (data) => {
+    auth.authorize(data.email, data.password)
+      .then((data) => {
+          if (data.token){
+              localStorage.setItem('token', data.token);
+              setIsLoggedIn(true);
+              history.push("/mesto-react");
+          }
+      })
+      .catch((err) => {
+        handleRegistrationResult(false)
+        console.log(`Пользователь не найден: ${err}`);
+      });
   }
 
   const handleUpdateUser = (currentUser) => {
@@ -111,7 +172,7 @@ function App() {
       <CardsContext.Provider value={cards}>
         <div className="page-container">
           <div className="page">
-            <Header />
+            
             <Switch>
               <ProtectedRoute 
                   onEditAvatar={setIsEditAvatarPopupOpen} 
@@ -121,16 +182,22 @@ function App() {
                   onCardLike={handleCardLike} 
                   onCardDelete={handleCardDelete} 
                   cards={cards}
+                  ownerEmail={ownerEmail} 
                   path="/mesto-react"
                   loggedIn={isLoggedIn}
                   component={Main}
               />
+
               <Route path="/sign-in">
-                <Login />
+                <Header redirect={() => history.push("/sign-up")} buttonText="Регистрация" />
+                <Login onLogin={handleLogin}/>
               </Route>
+
               <Route path="/sign-up">
-                <Register />
+                <Header redirect={() => history.push("/sign-in")} buttonText="Войти" />
+                <Register onRegister={handleRegistration}/>
               </Route>
+
               <Route exact path="/">
                 {isLoggedIn ? <Redirect to="/mesto-react" /> : <Redirect to="/sign-in" />}
               </Route>
@@ -138,6 +205,7 @@ function App() {
             </Switch>
             <Footer />
 
+            <RegistrationResult isOpen={isInfoPopupOpen} onClose={closeAllPopups} isSuccessful={isRegistrationSuccessful}/>
             <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
             <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/> 
             <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlace} />

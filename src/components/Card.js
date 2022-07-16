@@ -29,22 +29,22 @@ function Card(props) {
     }
 
     return (
-    <li className="card">
-        <img 
-            src={props.link} 
-            alt={props.name} 
-            className="card__image" 
-            onClick={handleCardClick}
-        />
-        <button type="button" className={cardDeleteButtonClassName} onClick={handleCardDelete}></button>
-        <div className="card__caption">
-            <h2 className="card__title">{props.name}</h2>
-            <div className="card__like-area">
-            <button type="button" className={cardLikeButtonClassName} onClick={handleLikeClick}></button>
-            <span className="card__like-count">{props.likes.length}</span>
+        <li className="card">
+            <img 
+                src={props.link} 
+                alt={props.name} 
+                className="card__image" 
+                onClick={handleCardClick}
+            />
+            <button type="button" className={cardDeleteButtonClassName} onClick={handleCardDelete}></button>
+            <div className="card__caption">
+                <h2 className="card__title">{props.name}</h2>
+                <div className="card__like-area">
+                <button type="button" className={cardLikeButtonClassName} onClick={handleLikeClick}></button>
+                <span className="card__like-count">{props.likes.length}</span>
+                </div>
             </div>
-        </div>
-    </li>
+        </li>
     )
 }
 

@@ -1,37 +1,3 @@
-// import sochiImage from '../images/sochi.jpg';
-// import bangkokImage from '../images/bangkok.jpg';
-// import ayutthayaImage from '../images/ayutthaya.jpg';
-// import phuketImage from '../images/phuket.jpg';
-// import samaraImage from '../images/samara.jpg';
-// import iremelImage from '../images/iremel.jpg';
-
-// export const initialCards = [
-//     {
-//       name: 'Сочи',
-//       link: sochiImage
-//     },
-//     {
-//       name: 'Бангкок',
-//       link: bangkokImage
-//     },
-//     {
-//       name: 'Айюттайя',
-//       link: ayutthayaImage
-//     },
-//     {
-//       name: 'Пхукет',
-//       link: phuketImage
-//     },
-//     {
-//       name: 'Иремель',
-//       link: iremelImage
-//     },
-//     {
-//       name: 'Самара',
-//       link: samaraImage
-//     }
-//   ]; 
-
 export const selectorList = {
   formSelector: '.form',
   inputSelector: '.popup__input',
@@ -64,7 +30,4 @@ export const formPlaceElement = document.querySelector('.place-form');
 export const formAvatarElement = document.querySelector('.avatar-form')
 
 export const popupProfileName = document.querySelector('.popup__input_type_name');
-export const popupProfileInfo = document.querySelector('.popup__input_type_info');
-
-
-  
+export const popupProfileInfo = document.querySelector('.popup__input_type_info'); 

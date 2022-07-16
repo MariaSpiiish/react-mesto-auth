@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
-function Login(props) {
+function Login({onLogin}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     function handleSubmit(e) {
         e.preventDefault();
-        props.onLogin({
+        onLogin({
             email,
             password
         });

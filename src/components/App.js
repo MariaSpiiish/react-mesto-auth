@@ -13,7 +13,7 @@ import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import RegistrationResult from './RegistrationResult';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import { CardsContext } from '../contexts/CardsContext';
+// import { CardsContext } from '../contexts/CardsContext';
 import { auth } from '../utils/Auth';
 
 function App() {
@@ -31,18 +31,19 @@ function App() {
 
   useEffect(() => {
     const checkToken = () => {
-      if(localStorage.getItem('token')) {
         const token = localStorage.getItem('token');
         if(token) {
           auth.getToken(token)
             .then((res) => {
-              const email = res.data.email;
+              const {email} = res.data;
               setOwnerEmail(email);
               setIsLoggedIn(true);
               history.push("/react-mesto-auth");
             })
+            .catch((err) => {
+              console.log(`Что-то не так с токеном: ${err}`);
+            });
         }
-      }
     }
     checkToken();
   }, [history]);
@@ -78,15 +79,14 @@ function App() {
     auth.register(data.email, data.password)
         .then((res) => {
             if(res) {
-              handleRegistrationResult(true)
+              handleRegistrationResult(true);
+              history.push("/sign-in");
             }
         })
         .catch((err) => {
           handleRegistrationResult(false)
           console.log(`Ошибка в регистрации пользователя: ${err}`);
         });
-
-    // history.push("/sign-in");
   }
 
   const handleRegistrationResult = (result) => {
@@ -113,6 +113,7 @@ function App() {
     api.patchUserInfo(currentUser)
       .then((userInfo) => {
         setCurrentUser(userInfo);
+        closeAllPopups();
       })
       .catch((err) => {
         console.log(`Ошибка в обновлении данных пользователя: ${err}`);
@@ -158,7 +159,7 @@ function App() {
   function handleCardDelete(card) {
     api.deleteCard(card, card._id)
       .then(() => {
-        setCards(cards.filter((c) => {
+        setCards(stateCards => stateCards.filter((c) => {
           return c._id !== card._id
         }))
       })
@@ -169,7 +170,7 @@ function App() {
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <CardsContext.Provider value={cards}>
+      {/* <CardsContext.Provider value={cards}> */}
         <div className="page-container">
           <div className="page">
             
@@ -211,22 +212,10 @@ function App() {
             <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlace} />
 
             <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
-
-            {/* 
-
-            <div className="popup popup_type_trash">
-              <div className="popup__trash-container">
-                <button type="button" className="popup__close-button popup__close-button_type_trash"></button>
-                <form name="trash" className="form trash-form" novalidate>
-                  <h2 className="popup__title">Вы уверены?</h2>
-                  <button type="submit" className="popup__submit-button popup__submit-button_type_trash opacity">Да</button>
-                </form>
-              </div>
-            </div> */}
             
           </div>
         </div>
-      </CardsContext.Provider>
+      {/* </CardsContext.Provider> */}
     </CurrentUserContext.Provider>  
   );
 }

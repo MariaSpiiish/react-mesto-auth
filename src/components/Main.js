@@ -4,7 +4,6 @@ import Card from './Card';
 import Header from './Header';
 
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-// import { CardsContext } from '../contexts/CardsContext';
 
 function Main({onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike, onCardDelete, cards, ownerEmail}) {
   const currentUser = useContext(CurrentUserContext);
@@ -20,6 +19,7 @@ function Main({onEditAvatar, onEditProfile, onAddPlace, onCardClick, onCardLike,
           }}
           buttonText="Выйти"
         />
+        
         <main className="content">
             <section className="profile">
               <div className="profile__avatar">

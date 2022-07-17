@@ -10,8 +10,6 @@ function Login({onLogin}) {
             email,
             password
         });
-        setEmail('');
-        setPassword('');
     }
 
     return (

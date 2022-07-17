@@ -13,7 +13,6 @@ import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import RegistrationResult from './RegistrationResult';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
-// import { CardsContext } from '../contexts/CardsContext';
 import { auth } from '../utils/Auth';
 
 function App() {
@@ -96,10 +95,11 @@ function App() {
 
   const handleLogin = (data) => {
     auth.authorize(data.email, data.password)
-      .then((data) => {
-          if (data.token){
-              localStorage.setItem('token', data.token);
+      .then((res) => {
+          if (res.token){
+              localStorage.setItem('token', res.token);
               setIsLoggedIn(true);
+              setOwnerEmail(data.email);
               history.push("/react-mesto-auth");
           }
       })
@@ -134,6 +134,7 @@ function App() {
     api.postNewCard(card)
       .then((newCard) => {
         setCards([newCard, ...cards]); 
+        closeAllPopups();
       })
       .catch((err) => {
         console.log(`Ошибка в обновлении новой карточки: ${err}`);
@@ -170,7 +171,6 @@ function App() {
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      {/* <CardsContext.Provider value={cards}> */}
         <div className="page-container">
           <div className="page">
             
@@ -215,7 +215,6 @@ function App() {
             
           </div>
         </div>
-      {/* </CardsContext.Provider> */}
     </CurrentUserContext.Provider>  
   );
 }

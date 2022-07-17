@@ -12,8 +12,6 @@ function Register({onRegister}) {
             email,
             password
         });
-        setEmail('');
-        setPassword('');
     }
 
     return (

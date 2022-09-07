@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
-import { api } from '../utils/Api';
+import { getUserInfo, patchUserInfo, patchUserAvatar, getCards, postNewCard, deleteCard, setCardLike } from '../utils/Api';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -28,13 +28,15 @@ function App() {
   const history = useHistory();
   const [ownerEmail, setOwnerEmail] = useState('');
 
+  const token = localStorage.getItem('token');
+
   useEffect(() => {
     const checkToken = () => {
         const token = localStorage.getItem('token');
         if(token) {
           auth.getToken(token)
             .then((res) => {
-              const {email} = res.data;
+              const {email} = res;
               setOwnerEmail(email);
               setIsLoggedIn(true);
               history.push("/react-mesto-auth");
@@ -46,25 +48,20 @@ function App() {
     }
     checkToken();
   }, [history]);
-
-
+      
   useEffect(() => {
-    api.getUserInfo()
-      .then((userData) => {
-        setCurrentUser(userData);
-      })
-      .catch((err) => {
-        console.log(`Ошибка в загрузке текущего пользователя: ${err}`);
-      });
-  }, []);
-
-  useEffect(() => {
-    api.getCards()
-      .then(setCards)
-      .catch((err) => {
-        console.log(`Ошибка в загрузке данных карточек: ${err}`);
-      });
-  }, [])
+    if(isLoggedIn) {
+      Promise.all([getUserInfo(token), getCards(token)])
+        .then(([user, data]) => {
+          setCurrentUser(user);
+          setCards(data);
+          history.push("/react-mesto-auth");
+        })
+        .catch((err) => {
+          console.log(`Ошибка загрузки пользователя и карточек ${err}`);
+        });
+    }
+  }, [isLoggedIn, history, token]);
 
   const closeAllPopups = () => {
     setIsEditAvatarPopupOpen(false);
@@ -110,7 +107,7 @@ function App() {
   }
 
   const handleUpdateUser = (currentUser) => {
-    api.patchUserInfo(currentUser)
+    patchUserInfo(currentUser)
       .then((userInfo) => {
         setCurrentUser(userInfo);
         closeAllPopups();
@@ -121,7 +118,7 @@ function App() {
   }
 
   const handleUpdateAvatar = (currentUser) => {
-    api.patchUserAvatar(currentUser)
+    patchUserAvatar(currentUser)
       .then((userAvatar) => {
         setCurrentUser(userAvatar)
       })
@@ -131,7 +128,7 @@ function App() {
   }
 
   const handleAddPlace = (card) => {
-    api.postNewCard(card)
+    postNewCard(card)
       .then((newCard) => {
         setCards([newCard, ...cards]); 
         closeAllPopups();
@@ -142,9 +139,9 @@ function App() {
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some(i => i === currentUser._id);
     
-    api.setCardLike(card._id, (!isLiked ? 'PUT' : 'DELETE'))
+    setCardLike(card._id, (!isLiked ? 'PUT' : 'DELETE'))
       .then((newCard) => {
         setCards(stateCards => {
           return stateCards.map((c) => (
@@ -158,7 +155,7 @@ function App() {
   }
 
   function handleCardDelete(card) {
-    api.deleteCard(card, card._id)
+    deleteCard(card, card._id)
       .then(() => {
         setCards(stateCards => stateCards.filter((c) => {
           return c._id !== card._id
@@ -181,7 +178,7 @@ function App() {
                   onAddPlace={setIsAddPlacePopupOpen} 
                   onCardClick={setSelectedCard} 
                   onCardLike={handleCardLike} 
-                  onCardDelete={handleCardDelete} 
+                  onCardDelete={handleCardDelete}
                   cards={cards}
                   ownerEmail={ownerEmail} 
                   path="/react-mesto-auth"

@@ -1,79 +1,103 @@
-class Api {
-  constructor(options) {
-      this.url = options.url;
-      this.headers = options.headers;
-  }
+const BASE_URL = 'http://localhost:3010';
 
-  _handleResponse(res) {
+function handleResponse(res) {
     if(res.ok) {
       return res.json();
     }
     return Promise.reject(res.status);
   }
 
-  getUserInfo() {
-      return fetch(`${this.url}/users/me`, {
-          headers: this.headers
-        })
-          .then(this._handleResponse)
-  }
-
-  patchUserInfo(data) {
-    return fetch(`${this.url}/users/me`, {
-      method: 'PATCH',
-      headers: this.headers,
-      body: JSON.stringify(data)
+export function getUserInfo(token) {
+  return fetch(`${BASE_URL}/users/me`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
     })
-    .then(this._handleResponse)
-  }
-
-  patchUserAvatar(avatar) {
-    return fetch(`${this.url}/users/me/avatar`, {
-      method: 'PATCH',
-      headers: this.headers,
-      body: JSON.stringify(avatar)
-    })
-    .then(this._handleResponse)
-  }
-
-  getCards() {
-      return fetch(`${this.url}/cards`, {
-        headers: this.headers
-      })
-        .then(this._handleResponse)
-  }
-
-  postNewCard(data) {
-      return fetch(`${this.url}/cards`, {
-        method: 'POST',
-        headers: this.headers,
-        body: JSON.stringify(data)
-      })
-      .then(this._handleResponse)
-  }
-
-  deleteCard(data, id) {
-    return fetch(`${this.url}/cards/${id}`, {
-      method: 'DELETE',
-      headers: this.headers,
-      body: JSON.stringify(data)
-    })
-    .then(this._handleResponse)
-  }
-
-  setCardLike(id, method) {
-    return fetch(`${this.url}/cards/${id}/likes`, {
-      method: method,
-      headers: this.headers,
-    })
-    .then(this._handleResponse)
-  }
+      .then(handleResponse)
 }
 
-export const api = new Api({
-  url: 'https://mesto.nomoreparties.co/v1/cohort-42',
-  headers: {
-    authorization: 'a9ef8c07-b83e-4444-b4dd-d87bd8a4730a',
-    'Content-Type': 'application/json',
-  }
-})
+export function patchUserInfo(data) {
+  return fetch(`${BASE_URL}/users/me`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(handleResponse)
+}
+
+export function patchUserAvatar(avatar) {
+  return fetch(`${BASE_URL}/users/me/avatar`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify(avatar)
+  })
+  .then(handleResponse)
+}
+
+export function getCards(token) {
+  return fetch(`${BASE_URL}/cards`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    }
+  })
+  .then(handleResponse)
+}
+
+export function postNewCard(data) {
+    return fetch(`${BASE_URL}/cards`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(handleResponse)
+}
+
+export function deleteCard(data, id) {
+  return fetch(`${BASE_URL}/cards/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(handleResponse)
+}
+
+export function setCardLike(id, method) {
+  return fetch(`${BASE_URL}/cards/${id}/likes`, {
+    method: method,
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    }
+  })
+  .then(handleResponse)
+}
+
+
+// export const api = new Api({
+//   url: 'http://localhost:3010',
+//   headers: {
+//     'Authorization': `Bearer ${localStorage.getItem('token')}`,
+//     'Content-Type': 'application/json',
+//   }
+// })

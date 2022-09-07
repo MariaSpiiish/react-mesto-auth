@@ -5,13 +5,13 @@ function Card(props) {
     const currentUser = useContext(CurrentUserContext);
     
         // Определяем, являемся ли мы владельцем текущей карточки
-    const isOwn = props.owner._id === currentUser._id;
+    const isOwn = props.owner === currentUser._id;
     const cardDeleteButtonClassName = (
     `card__trash opacity ${isOwn && 'card__trash_active'}`
     ); 
 
         // Определяем, есть ли у карточки лайк, поставленный текущим пользователем
-    const isLiked = props.likes.some(i => i._id === currentUser._id);
+    const isLiked = props.likes.some(i => i === currentUser._id);
     const cardLikeButtonClassName = (
         `card__like opacity ${isLiked && 'card__like_active'}`
     ); 

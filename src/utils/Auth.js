@@ -45,5 +45,5 @@ class Auth {
 }
 
 export const auth = new Auth({
-    url: 'https://auth.nomoreparties.co',
+    url: 'http://localhost:3010',
 })
